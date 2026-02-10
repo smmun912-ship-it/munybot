@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-PAGES_URL = os.environ.get("GITHUB_PAGES_URL", "")
+PAGES_URL = os.environ.get("PAGES_URL", "")
 
 
 def send_telegram_message(text: str, parse_mode: str = "HTML") -> bool:
