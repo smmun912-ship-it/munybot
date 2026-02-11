@@ -2,8 +2,8 @@ name: YouTube Daily Digest
 
 on:
   schedule:
-    # 매일 오전 8시 KST (UTC 23:00 전날)
-    - cron: "0 23 * * *"
+    # 매일 오전 7시 KST (UTC 22:00 전날)
+    - cron: "0 22 * * *"
   workflow_dispatch: # 수동 실행도 가능
 
 permissions:
