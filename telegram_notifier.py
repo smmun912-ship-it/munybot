@@ -14,6 +14,11 @@ from config import get_today_output_dir
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+# Windows 콘솔 출력 인코딩 설정
+import sys
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 PAGES_URL = os.environ.get("PAGES_URL", "")
@@ -81,20 +86,24 @@ def build_daily_report() -> str:
             lines.append(f"  • {ch['name']}: {video_count}개 영상")
             for v in ch.get("videos", [])[:2]:
                 emoji = "✅" if v.get("has_transcript") else "⚠️"
-                lines.append(f"    {emoji} {v['title'][:40]}")
+                title = v['title'][:45]
+                url = v.get('url', '')
+                summary = v.get('summary', '')
+
+                if url:
+                    lines.append(f"    {emoji} <a href='{url}'>{title}</a>")
+                else:
+                    lines.append(f"    {emoji} {title}")
+                
+                if summary:
+                    summary_lines = summary.strip().split('\n')
+                    for line in summary_lines:
+                        lines.append(f"    {line}")
+                    lines.append("")  # Add empty line after summary
         lines.append("")
 
-    # 링크 추가
-    if PAGES_URL:
-        lines.extend([
-            "🔗 <b>바로보기:</b>",
-            f"  📊 <a href='{PAGES_URL}/slides.html'>슬라이드</a>",
-            f"  🎨 <a href='{PAGES_URL}/infographic.html'>인포그래픽</a>",
-            f"  🎙️ <a href='{PAGES_URL}/podcast.md'>팟캐스트 스크립트</a>",
-            f"  📄 <a href='{PAGES_URL}/summary.md'>종합 보고서</a>",
-        ])
-    else:
-        lines.append("ℹ️ GitHub Pages URL을 설정하면 바로보기 링크가 추가됩니다.")
+    # 링크 추가 (수집된 영상이 있을 때만)
+    # User Request: Remove slides/infographics links
 
     if total_videos == 0:
         lines.insert(4, "ℹ️ 최근 24시간 내 새 영상이 없습니다.")

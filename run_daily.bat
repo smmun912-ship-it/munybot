@@ -17,6 +17,9 @@ set PYTHONIOENCODING=utf-8
 REM 파이썬 실행
 python main.py
 
+REM 텔레그램 알림 전송 (토큰 설정 필요)
+python telegram_notifier.py
+
 REM 결과 확인
 if %errorlevel% equ 0 (
     echo.

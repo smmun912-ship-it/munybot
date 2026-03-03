@@ -236,6 +236,11 @@ def run_research() -> dict:
         logger.info(f"{'─' * 40}")
 
         # 1. 최근 영상 수집
+        # 봇 탐지 회피를 위한 랜덤 지연
+        import time
+        import random
+        time.sleep(random.uniform(2, 5))
+        
         videos = fetch_recent_videos(channel["handle"])
 
         if not videos:
@@ -270,6 +275,7 @@ def run_research() -> dict:
                     "title": v["title"],
                     "url": v["url"],
                     "has_transcript": v.get("transcript_success", False),
+                    "transcript": v.get("transcript", ""),
                 }
                 for v in videos_with_transcripts
             ],

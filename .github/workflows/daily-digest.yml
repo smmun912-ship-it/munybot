@@ -2,8 +2,8 @@ name: YouTube Daily Digest
 
 on:
   schedule:
-    # 매일 오전 7시 KST (UTC 22:00 전날)
-    - cron: "0 22 * * *"
+    # 매일 오전 7시 15분 KST (UTC 22:15 전날) - GitHub Actions 혼잡 시간대 회피
+    - cron: "15 22 * * *"
   workflow_dispatch: # 수동 실행도 가능
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
           TODAY=$(date +%Y-%m-%d -d "+9 hours")
           OUTPUT_DIR="output/$TODAY"
 
-          if [ -d "$OUTPUT_DIR" ]; then
+          if [ -d "$OUTPUT_DIR" ] && [ -f "$OUTPUT_DIR/slides.html" ]; then
             # docs 디렉토리에 최신 결과 복사
             mkdir -p docs
             cp "$OUTPUT_DIR/slides.html" docs/slides.html 2>/dev/null || true
@@ -46,7 +46,7 @@ jobs:
             cp "$OUTPUT_DIR/combined_summary.md" docs/summary.md 2>/dev/null || true
             cp "$OUTPUT_DIR/podcast_script.md" docs/podcast.md 2>/dev/null || true
             
-            # index.html 생성
+            # index.html 생성 (자료가 있는 경우)
             cat > docs/index.html << 'INDEXEOF'
           <!DOCTYPE html>
           <html lang="ko">
@@ -82,6 +82,35 @@ jobs:
           </body>
           </html>
           INDEXEOF
+            echo "✅ GitHub Pages 파일 업데이트 완료"
+          else
+            echo "⚠️ 새로운 자료가 없습니다 ($OUTPUT_DIR/slides.html 미발견)."
+            # index.html을 '업데이트 없음' 안내 페이지로 덮어쓰거나, 기존 유지.
+            # 여기서는 명확히 안내 페이지를 생성합니다.
+            mkdir -p docs
+            cat > docs/index.html << 'NOUPDATEEOF'
+          <!DOCTYPE html>
+          <html lang="ko">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AI/테크 데일리 다이제스트</title>
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+              * { margin:0; padding:0; box-sizing:border-box; }
+              body { font-family:'Noto Sans KR',sans-serif; background:#0f0c29; color:#e8e8e8; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content: center; padding:40px 20px; }
+              h1 { font-size:2em; color: #a5b4fc; margin-bottom:20px; }
+              p { color:rgba(255,255,255,0.6); }
+            </style>
+          </head>
+          <body>
+            <h1>오늘은 새로운 업데이트가 없습니다</h1>
+            <p>최근 24시간 내 분석 대상 채널에 새로운 영상이 올라오지 않았습니다.</p>
+            <p>내일 다시 확인해주세요!</p>
+          </body>
+          </html>
+          NOUPDATEEOF
+          fi
             echo "✅ GitHub Pages 파일 준비 완료"
           else
             echo "⚠️ 출력 디렉토리 없음: $OUTPUT_DIR"

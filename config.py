@@ -36,14 +36,16 @@ GEMINI_MODEL = "gemini-2.0-flash"
 # ============================================================
 # NotebookLM 설정
 # ============================================================
-NOTEBOOKLM_NOTEBOOK_URL = os.environ.get("NOTEBOOKLM_NOTEBOOK_URL", "")
+# NOTEBOOKLM_NOTEBOOK_URL = os.environ.get("NOTEBOOKLM_NOTEBOOK_URL", "")
+# 현재 NotebookLM은 공식 API를 제공하지 않아 자동 업로드가 불가능합니다.
+# 추후 API가 공개되면 구현될 예정입니다.
 
 # ============================================================
 # 실행 설정
 # ============================================================
 HOURS_LOOKBACK = 24  # 최근 N시간 이내 영상만 수집
 MAX_VIDEOS_PER_CHANNEL = 5  # 채널당 최대 수집 영상 수
-TRANSCRIPT_LANGUAGES = ["ko", "en"]  # 자막 우선순위 (한국어 > 영어)
+TRANSCRIPT_LANGUAGES = ["ko", "ko-KR", "en", "en-US", "en-GB"]  # 자막 우선순위 확장
 
 # ============================================================
 # 출력 설정
