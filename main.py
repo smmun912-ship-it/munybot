@@ -6,7 +6,7 @@ import logging
 import traceback
 from datetime import datetime
 
-from config import get_today_output_dir
+from config import get_today_output_dir, JEJU_FLIGHT_ENABLED
 
 logging.basicConfig(
     level=logging.INFO,
@@ -89,6 +89,23 @@ def run_pipeline():
             "slides": slides_path,
             "infographic": infographic_path,
         }
+
+        # ──────────────────────────────────────
+        # Stage 4 (Optional): 제주 항공편 검색
+        # ──────────────────────────────────────
+        if JEJU_FLIGHT_ENABLED:
+            logger.info("\n" + "=" * 60)
+            logger.info("📌 Stage 4/4: 제주 항공편 검색")
+            logger.info("=" * 60)
+            try:
+                from jeju_flight_search import build_flight_report
+                from config import JEJU_FLIGHT_ORIGINS
+                report = build_flight_report(origins=JEJU_FLIGHT_ORIGINS)
+                logger.info(report.replace("<b>", "").replace("</b>", "").replace("<a href='", "").replace("</a>", ""))
+                results["stages"]["jeju_flights"] = {"success": True}
+            except Exception as e:
+                logger.warning(f"⚠️ 항공편 검색 실패 (파이프라인은 계속): {e}")
+                results["stages"]["jeju_flights"] = {"success": False, "error": str(e)}
 
         results["success"] = True
 

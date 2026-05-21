@@ -9,7 +9,7 @@ import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
-from config import get_today_output_dir
+from config import get_today_output_dir, JEJU_FLIGHT_ENABLED, JEJU_FLIGHT_ORIGINS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -107,6 +107,14 @@ def build_daily_report() -> str:
 
     if total_videos == 0:
         lines.insert(4, "ℹ️ 최근 24시간 내 새 영상이 없습니다.")
+
+    if JEJU_FLIGHT_ENABLED:
+        try:
+            from jeju_flight_search import build_flight_report
+            lines.append("─" * 20)
+            lines.append(build_flight_report(origins=JEJU_FLIGHT_ORIGINS))
+        except Exception as e:
+            logger.warning(f"항공편 리포트 생성 실패: {e}")
 
     return "\n".join(lines)
 
